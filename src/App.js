@@ -6,6 +6,11 @@ import { compose, graphql } from 'react-apollo';
 import ListRestaurants from './queries/ListRestaurants';
 
 class App extends Component {
+  state = {
+    name: '',
+    city: '',
+    category: ''
+  }
   render() {
     return (
       <div className="App">
