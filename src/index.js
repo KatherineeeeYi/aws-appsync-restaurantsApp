@@ -1,12 +1,32 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDom from 'react-dom';
 import './index.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import Client from 'aws-appsync';
+import { Rehydrated } from 'aws-appsync-react';
+import { ApolloProvider as Provider } from 'react-apollo';
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+import config from './aws-exports';
+
+// create a client 
+const client = new Client({
+  url: config.aws_appsync_graphqlEndpoint,
+  region: config.aws_appsync_region,
+  auth: {
+    type: config.aws_appsync_authenticationType,
+    apiKey: config.aws_appsync_apiKey
+  }
+});
+
+// 
+const WithProvider = () => (
+  //data is imediately available offline
+  <Provider client={client}>
+    <Rehydrated>
+      <App />
+    </Rehydrated>
+  </Provider>
+);
+
+ReactDom.render(<WithProvider />, document.getElementById('root'));
