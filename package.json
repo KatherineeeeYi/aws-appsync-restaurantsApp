@@ -5,11 +5,16 @@
   "dependencies": {
     "aws-appsync": "^1.5.1",
     "aws-appsync-react": "^1.2.2",
+    "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
+    "moment": "^2.22.2",
     "react": "^16.6.3",
     "react-apollo": "^2.3.2",
+    "react-datepicker": "^2.0.0",
     "react-dom": "^16.6.3",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
+    "semantic-ui-css": "^2.4.1",
     "uuid": "^3.3.2"
   },
   "scripts": {

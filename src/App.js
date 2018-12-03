@@ -1,39 +1,68 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter, Route } from 'react-router-dom';
+import "semantic-ui-css/semantic.min.css";
+import 'react-datepicker/dist/react-datepicker.css';
+
+import Header from './Components/Header';
+import AddRestaurant from './Components/AddRestaurant';
+import Restaurants from './Components/Restaurants';
+import ViewRestaurant from './Components/ViewRestaurant';
+
+
 import './App.css';
+import {AWSAppSyncClient as Client, defaultDataIdFromObject } from "aws-appsync";
+import { Rehydrated } from 'aws-appsync-react';
+import { ApolloProvider as Provider } from 'react-apollo';
+import config from './aws-exports';
 
-import { compose, graphql } from 'react-apollo';
-import ListRestaurants from './queries/ListRestaurants';
+const Home = () => (
+  <div className="ui container">
+    <Restaurants />
+  </div>
+);
 
-class App extends Component {
-  state = {
-    name: '',
-    city: '',
-    category: ''
-  }
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-        </header>
-        {
-          this.props.restaurants.map((restaurant, index) => (
-            <div>
-              <p>{restaurant.name}</p>
-            </div>
-          ))
-        }
-      </div>
-    );
-  }
-}
+const App = () => (
+  <BrowserRouter>
+    <div>
+      <Route exact={true} path="/" component={Home} />
+      <Route path="/restaurant/:id" component={ViewRestaurant} />
+      <Route path="/addRestaurant" component={AddRestaurant} />
+    </div>
+  </BrowserRouter>
+);
 
-export default graphql(ListRestaurants, {
-  options: {
-    fetchPolicy: 'cache-and-network'
+const client = new Client({
+  url: config.aws_appsync_graphqlEndpoint,
+  region: config.aws_appsync_region,
+  auth: {
+    type: config.aws_appsync_authenticationType,
+    apiKey: config.aws_appsync_apiKey,
   },
-  props: props => ({
-    restaurants: props.data.listRestaurants ? props.data.listRestaurants.items : []
-  })
-})(App);
+  cacheOptions: {
+    dataIdFromObject: (obj) => {
+      let id = defaultDataIdFromObject(obj);
+
+      if (!id) {
+        const { __typename: typename } = obj;
+        switch (typename) {
+          case 'Comment':
+            return `${typename}:${obj.commentId}`;
+          default:
+            return id;
+        }
+      }
+
+      return id;
+    }
+  }
+});
+
+const WithProvider = () => (
+  <Provider client={client}>
+    <Rehydrated>
+      <App />
+    </Rehydrated>
+  </Provider>
+);
+
+export default WithProvider;
