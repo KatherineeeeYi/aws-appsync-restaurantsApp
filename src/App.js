@@ -1,13 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 import "semantic-ui-css/semantic.min.css";
-import 'react-datepicker/dist/react-datepicker.css';
-
-import Header from './Components/Header';
 import AddRestaurant from './Components/AddRestaurant';
 import Restaurants from './Components/Restaurants';
 import ViewRestaurant from './Components/ViewRestaurant';
-
 
 import './App.css';
 import {AWSAppSyncClient as Client, defaultDataIdFromObject } from "aws-appsync";
@@ -16,7 +12,7 @@ import { ApolloProvider as Provider } from 'react-apollo';
 import config from './aws-exports';
 
 const Home = () => (
-  <div className="ui container">
+  <div className="container">
     <Restaurants />
   </div>
 );
@@ -46,7 +42,7 @@ const client = new Client({
         const { __typename: typename } = obj;
         switch (typename) {
           case 'Comment':
-            return `${typename}:${obj.commentId}`;
+            return `${typename}:${obj.id}`;
           default:
             return id;
         }

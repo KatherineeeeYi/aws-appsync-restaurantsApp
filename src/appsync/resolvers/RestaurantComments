@@ -1,0 +1,33 @@
+## Data Source Name
+
+CommentTable
+
+##Configure the request mapping template.
+
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query": {
+      "expression": "#restaurantId = :restaurantId",
+      "expressionNames": {
+        "#restaurantId": "restaurantId",
+      },
+      "expressionValues": {
+        ":restaurantId":  {
+            	"S": "$ctx.source.id"
+            }
+      }
+  	},
+    "index" : "id-restaurantId-index",
+    "limit": $util.defaultIfNull($ctx.args.first, 20),
+    "nextToken": $util.toJson($util.defaultIfNullOrEmpty($ctx.args.after, null)),
+    "scanIndexForward": true,
+    "select": "ALL_ATTRIBUTES",
+}
+
+##Configure the response mapping template.
+
+{
+	"items": $util.toJson($context.result.items),
+    "nextToken": $util.toJson($context.result.nextToken)
+}

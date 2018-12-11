@@ -11,8 +11,8 @@ export default graphql`
       content: $content
       createdAt: $createdAt
     }) {
-      reataurantId
-      commentId
+      id
+      restaurantId
       content
       createdAt
     }

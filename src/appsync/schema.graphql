@@ -1,28 +1,6 @@
-type Category {
-	id: ID
-	name: String!
-	restaurants: [Restaurant]
-}
-
-type CategoryConnection {
-	items: [Category]
-	nextToken: String
-}
-
-type City {
-	id: ID!
-	name: String!
-	restaurants: [Restaurant]
-}
-
-type CityConnection {
-	items: [City]
-	nextToken: String
-}
-
 type Comment {
+	id: ID!
 	restaurantId: ID!
-	commentId: String!
 	content: String!
 	createdAt: String!
 }
@@ -32,17 +10,8 @@ type CommentConnection {
 	nextToken: String
 }
 
-input CreateCategoryInput {
-	name: String!
-}
-
-input CreateCityInput {
-	name: String!
-}
-
-input CreateCommentInput {
+input CommentOnRestaurantInput {
 	restaurantId: ID!
-	commentId: String!
 	content: String!
 	createdAt: String!
 }
@@ -53,19 +22,10 @@ input CreateRestaurantInput {
 	category: String!
 	city: String!
 	comments: [String]
-	rate: Float
-}
-
-input DeleteCategoryInput {
-	id: ID!
-}
-
-input DeleteCityInput {
-	id: ID!
 }
 
 input DeleteCommentInput {
-	commentId: String!
+	id: ID!
 }
 
 input DeleteRestaurantInput {
@@ -76,26 +36,16 @@ type Mutation {
 	createRestaurant(input: CreateRestaurantInput!): Restaurant
 	updateRestaurant(input: UpdateRestaurantInput!): Restaurant
 	deleteRestaurant(input: DeleteRestaurantInput!): Restaurant
-	createCity(input: CreateCityInput!): City
-	updateCity(input: UpdateCityInput!): City
-	deleteCity(input: DeleteCityInput!): City
-	createComment(input: CreateCommentInput!): Comment
+	commentOnRestaurant(input: CommentOnRestaurantInput!): Comment
 	updateComment(input: UpdateCommentInput!): Comment
 	deleteComment(input: DeleteCommentInput!): Comment
-	createCategory(input: CreateCategoryInput!): Category
-	updateCategory(input: UpdateCategoryInput!): Category
-	deleteCategory(input: DeleteCategoryInput!): Category
 }
 
 type Query {
 	getRestaurant(id: ID!): Restaurant
 	listRestaurants(filter: TableRestaurantFilterInput, limit: Int, nextToken: String): RestaurantConnection
-	getCity(id: ID!): City
-	listCities(filter: TableCityFilterInput, limit: Int, nextToken: String): CityConnection
-	getComment(commentId: String!): Comment
-	listComments(filter: TableCommentFilterInput, limit: Int, nextToken: String): CommentConnection
-	getCategory(id: ID!): Category
-	listCategories(filter: TableCategoryFilterInput, limit: Int, nextToken: String): CategoryConnection
+	getComment(id: ID!): Comment
+  listComments(filter: TableCommentFilterInput, limit: Int, nextToken: String): CommentConnection
 }
 
 type Restaurant {
@@ -103,11 +53,8 @@ type Restaurant {
 	name: String!
 	address: String
 	category: String!
-	categoryID: ID!
 	city: String!
-	cityID: ID!
-	comments: [String]
-	rate: Float
+	comments(limit: Int, nextToken: String): CommentConnection
 }
 
 type RestaurantConnection {
@@ -140,61 +87,32 @@ type Subscription {
 		city: String
 	): Restaurant
 		@aws_subscribe(mutations: ["deleteRestaurant"])
-	onCreateCity(id: ID, name: String): City
-		@aws_subscribe(mutations: ["createCity"])
-	onUpdateCity(id: ID, name: String): City
-		@aws_subscribe(mutations: ["updateCity"])
-	onDeleteCity(id: ID, name: String): City
-		@aws_subscribe(mutations: ["deleteCity"])
 	onCreateComment(
 		restaurantId: ID,
-		commentId: String,
+		id: ID,
 		content: String,
 		createdAt: String
 	): Comment
-		@aws_subscribe(mutations: ["createComment"])
+		@aws_subscribe(mutations: ["commentOnRestaurant"])
 	onUpdateComment(
 		restaurantId: ID,
-		commentId: String,
+		id: ID,
 		content: String,
 		createdAt: String
 	): Comment
 		@aws_subscribe(mutations: ["updateComment"])
 	onDeleteComment(
 		restaurantId: ID,
-		commentId: String,
+		id: ID,
 		content: String,
 		createdAt: String
 	): Comment
 		@aws_subscribe(mutations: ["deleteComment"])
-	onCreateCategory(id: ID, name: String): Category
-		@aws_subscribe(mutations: ["createCategory"])
-	onUpdateCategory(id: ID, name: String): Category
-		@aws_subscribe(mutations: ["updateCategory"])
-	onDeleteCategory(id: ID, name: String): Category
-		@aws_subscribe(mutations: ["deleteCategory"])
 }
 
 input TableBooleanFilterInput {
 	ne: Boolean
 	eq: Boolean
-}
-
-input TableCategoryFilterInput {
-	id: TableIDFilterInput
-	name: TableStringFilterInput
-}
-
-input TableCityFilterInput {
-	id: TableIDFilterInput
-	name: TableStringFilterInput
-}
-
-input TableCommentFilterInput {
-	restaurantId: TableIDFilterInput
-	commentId: TableStringFilterInput
-	content: TableStringFilterInput
-	createdAt: TableStringFilterInput
 }
 
 input TableFloatFilterInput {
@@ -241,7 +159,6 @@ input TableRestaurantFilterInput {
 	category: TableStringFilterInput
 	city: TableStringFilterInput
 	comments: TableStringFilterInput
-	rate: TableFloatFilterInput
 }
 
 input TableStringFilterInput {
@@ -257,21 +174,11 @@ input TableStringFilterInput {
 	beginsWith: String
 }
 
-input UpdateCategoryInput {
-	id: ID!
-	name: String
-}
-
-input UpdateCityInput {
-	id: ID!
-	name: String
-}
-
 input UpdateCommentInput {
 	restaurantId: ID
-	commentId: String!
+	id: ID!
 	content: String
-	createdAt: String
+	createdAt: String!
 }
 
 input UpdateRestaurantInput {
@@ -281,7 +188,6 @@ input UpdateRestaurantInput {
 	category: String
 	city: String
 	comments: [String]
-	rate: Float
 }
 
 schema {

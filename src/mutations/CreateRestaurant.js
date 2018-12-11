@@ -15,7 +15,7 @@ export default graphql`
       address
       comments {
         items {
-          commentId
+          id
         }
       }
     }
